@@ -10,6 +10,7 @@
         <div id="welcome-screen">
 
             <button id="play-button">Play</button>
+            <button id="scores-button" onclick="displayScores()">Scores</button>
         </div>
 
         <div id="game-screen" style="display:none">
@@ -19,6 +20,15 @@
             <div class="game-board">
                 <div class="grid"></div>
             </div>
+        <div id="high-score">
+            <h2>High Scores</h2>
+            <ol id="score-list"></ol>
+            <form id="name-form">
+                <label for="name">Enter your name:</label>
+                <input type="text" id="name" name="name">
+                <button type="submit" onclick="submitName()">Submit</button>
+            </form>
+        </div>
 
         </div>
 
