@@ -1,0 +1,47 @@
+body {
+    background-image: url('wallpaper/wallpaper1.jpg');
+    color: white;
+    background-position: center;
+    background-attachment: fixed;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    font-family: Arial, sans-serif;
+}
+
+.grid{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    height: 560px;
+    width: 560px;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+    border: 5px solid mediumpurple;
+}
+
+.grid div{
+    height: 70px;
+    width: 70px;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.grid div:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+.rotate {
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate{
+    from {
+        transform: rotateY(0deg);
+    }
+    to {
+        transform: rotateY(360deg);
+    }
+}
