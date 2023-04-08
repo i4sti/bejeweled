@@ -1,5 +1,4 @@
 //menu
-const welcomeScreen = document.getElementById('welcome-screen');
 const gameScreen = document.getElementById('game-screen');
 
 function submitName() {
@@ -25,55 +24,103 @@ function submitName() {
     // updateScoreList();
     nameInput.value = '';
 }
+
 //display scores
-function displayScores() {
-    const scoreList = document.getElementById('score-list');
-    const scores = Object.entries(localStorage)
-        .filter(([key, value]) => !isNaN(value))
-        .map(([key, value]) => ({ name: key, score: parseInt(value) }))
-        .sort((a, b) => b.score - a.score);
+// Get the high scores from local storage
+const scoreList = document.getElementById("score-list");
+const highScores = JSON.parse(localStorage.getItem("highScores")) || {};
 
-    // Clear previous scores from the list
-    scoreList.innerHTML = '';
+Object.entries(highScores).forEach(([name, score]) => {
+    const listItem = document.createElement("li");
+    if (JSON.stringify(score) === "{}"){
+        listItem.textContent = `${name}: 0`;
 
-    // Append each score to the list as a new item
-    scores.forEach((score) => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${score.name}: ${score.score}`;
-        scoreList.appendChild(listItem);
-    });
-}
+    }else {
+        listItem.textContent = `${name}: ${JSON.stringify(score)}`;
 
-
-
-
-
-
-//score
-
-
-
-// Get a reference to the play button
-const playButton = document.getElementById('play-button');
-
-// Add an event listener to the play button
-playButton.addEventListener('click', () => {
-    console.log("mehet a jatek")
-    // Hide the welcome screen
-    welcomeScreen.style.display = 'none';
-
-    // Show the game screen
-    gameScreen.style.display = 'block';
+    }
+    scoreList.appendChild(listItem);
 });
 
 
+
+
+
+
+
+
+//score and level
+let score = 0
+const levelThresholds = [50, 100, 150, 200];
+
+let currentLevel = 1;
+let time = 10;
+let intervalId = null;
+
+
+const scoreElement = document.getElementById("score");
+
+scoreElement.textContent = score;
+document.getElementById("level").textContent = `Level ${currentLevel}`;
+const timer = document.querySelector(".timer");
+const totalTime = 100;
+let timeLeft = totalTime;
+function updateScore(points) {
+    score += points;
+    timeLeft++;
+
+    scoreElement.textContent = score;
+    updateLevel(score)
+}
+
+
+function updateTimer() {
+    console.log(timeLeft)
+    if (timeLeft > totalTime) {
+        timeLeft = totalTime;
+    }
+    const timerWidth = (timeLeft / totalTime) * 100 + "%";
+    timer.style.width = timerWidth;
+    timeLeft--;
+    if (timeLeft < 0) {
+        clearInterval(interval);
+        alert("Time's up! You lost. :(");
+    }
+}
+
+let interval = setInterval(updateTimer, 1000); // update the timer every second
+
+// Update the level based on the current score
+function updateLevel(score) {
+    let previousLevel = currentLevel; // keep track of the previous level
+
+    for (let i = 0; i < levelThresholds.length; i++) {
+        if (score >= levelThresholds[i]) {
+            currentLevel = i + 1;
+
+        } else {
+            break;
+        }
+    }
+    if (previousLevel !== currentLevel) { // check if the level has changed
+        timeLeft = 100; // reset the timer
+    }
+    document.getElementById("level").textContent = `Level ${currentLevel}`;
+}
+function updateScoreEverySecond() {
+    setInterval(() => {
+        const randomScore = 5;
+        updateScore(randomScore);
+    }, 3000); // call the function every 1 second
+}
+updateScoreEverySecond()
 //Game
 document.addEventListener('DOMContentLoaded', ()=>{
     const grid = document.querySelector('.grid')
     const scoreDisplay = document.getElementById('score')
     const width = 8
     const squares = []
-    let score = 0
+
 
 
     const audio = new Audio('sounds/backroundmusic.mp3');
