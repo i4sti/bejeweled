@@ -107,13 +107,13 @@ function updateLevel(score) {
     }
     document.getElementById("level").textContent = `Level ${currentLevel}`;
 }
-function updateScoreEverySecond() {
-    setInterval(() => {
-        const randomScore = 5;
-        updateScore(randomScore);
-    }, 3000); // call the function every 1 second
-}
-updateScoreEverySecond()
+// function updateScoreEverySecond() {
+//     setInterval(() => {
+//         const randomScore = 5;
+//         updateScore(randomScore);
+//     }, 3000); // call the function every 1 second
+// }
+// updateScoreEverySecond()
 //Game
 document.addEventListener('DOMContentLoaded', ()=>{
     const grid = document.querySelector('.grid')
@@ -193,6 +193,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
     }
 
+
     function swapSquares(firstSquare, secondSquare) {
         const firstId = parseInt(firstSquare.id)
         const secondId = parseInt(secondSquare.id)
@@ -240,7 +241,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 if ((row !== -1 || vertical !== -1) && (elso || masodik) ) {
                     console.log("row " + row)
                     console.log("vertiacl " + vertical)
-                    moveDown()
+                    while (isMoveDownNeeded()){
+                        console.log("kell csuszni")
+                        moveDown()
+                    }
+                    console.log("nem kell már lecsuszni")
                     // There is a match, so leave the new colors of the gems as they are
                 } else{
                     console.log("nem volt match")
@@ -280,27 +285,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         return isAdjacentCol || isAdjacentRow
     }
     //movedown if cleared
-    function moveDown(){
-        let allFilled = false
 
-            for (let i = 0; i < 55; i++) {
-                if (squares[i + width].style.backgroundImage === ''){
-
-                    squares[i+width].style.backgroundImage = squares[i].style.backgroundImage
-                    squares[i].style.backgroundImage = ''
-                    const firstRow = [0, 1, 2, 3, 4, 5, 6, 7]
-                    const isFirstRow = firstRow.includes(i)
-                    if (isFirstRow && squares[i].style.backgroundImage === ''){
-                        console.log("lekellcsuszni")
-                        let randomColor = Math.floor(Math.random() * jewelColors.length)
-                        squares[i].style.backgroundImage = jewelColors[randomColor]
-                    }
-
-                }
-            }
-
-
-    }
 
 
     function checkForRow() {
@@ -316,10 +301,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
             if (isMatch && i % width < width - 2) {
                 row = i;
+                console.log("torles")
                 // Clear the matched gems
-                // currentGem.style.backgroundImage = '';
-                // nextGem.style.backgroundImage = '';
-                // nextNextGem.style.backgroundImage = '';
+                currentGem.style.backgroundImage = '';
+                nextGem.style.backgroundImage = '';
+                nextNextGem.style.backgroundImage = '';
+                console.log("torles kesz")
+
             }
         }
 
@@ -336,11 +324,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
             ) {
                 console.log('Vertical match at ' + i);
                 vertical = i;
-
+                console.log("torles")
                 // Clear the matched gems
-                // squares[i].style.backgroundImage = '';
-                // squares[i + width].style.backgroundImage = '';
-                // squares[i + width * 2].style.backgroundImage = '';
+                squares[i].style.backgroundImage = '';
+                squares[i + width].style.backgroundImage = '';
+                squares[i + width * 2].style.backgroundImage = '';
+                console.log("torles kesz")
+
             }
         }
 
@@ -351,8 +341,51 @@ document.addEventListener('DOMContentLoaded', ()=>{
     // setInterval(checkForVertical,500)
     // setInterval(checkForRow,500)
 
+    function isMoveDownNeeded(){
+        for (let i = 0; i < 55; i++) {
+            if (squares[i + width].style.backgroundImage === '') {
+                return true
+            }
+        }
+        return false
+    }
+
+    function moveDown(){
+        let allFilled = false
+
+        for (let i = 0; i < 55; i++) {
+            if (squares[i + width].style.backgroundImage === ''){
+
+                squares[i+width].style.backgroundImage = squares[i].style.backgroundImage
+                squares[i].style.backgroundImage = ''
+                const firstRow = [0, 1, 2, 3, 4, 5, 6, 7]
+                const isFirstRow = firstRow.includes(i)
+                if (isFirstRow && squares[i].style.backgroundImage === ''){
+                    // console.log("lekellcsuszni")
+                    let randomColor = Math.floor(Math.random() * jewelColors.length)
+                    squares[i].style.backgroundImage = jewelColors[randomColor]
+                }
+
+            }
+        }
 
 
+    }
+    setInterval(function(){
+        while (isMoveDownNeeded()){
+            console.log("kell csuszni")
+            moveDown()
+        }
+        console.log("nem kell már lecsuszni")
+
+        // if (checkForRow() ||
+        //     checkForVertical()){
+        //     console.log("itt lesz sazr")
+        //     updateScore(5)
+        //
+        // }
+
+    }, 500);
 
 
 })
