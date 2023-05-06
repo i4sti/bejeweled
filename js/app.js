@@ -75,7 +75,6 @@ function updateScore(points) {
 
 
 function updateTimer() {
-    console.log(timeLeft)
     if (timeLeft > totalTime) {
         timeLeft = totalTime;
     }
@@ -89,6 +88,14 @@ function updateTimer() {
 }
 
 let interval = setInterval(updateTimer, 1000); // update the timer every second
+
+const plusButton = document.getElementById("plus-button");
+plusButton.addEventListener("click", function() {
+    if (score >= 10) {
+        timeLeft++;
+        updateScore(-10);
+    }
+});
 
 // Update the level based on the current score
 function updateLevel(score) {
@@ -107,13 +114,6 @@ function updateLevel(score) {
     }
     document.getElementById("level").textContent = `Level ${currentLevel}`;
 }
-// function updateScoreEverySecond() {
-//     setInterval(() => {
-//         const randomScore = 5;
-//         updateScore(randomScore);
-//     }, 3000); // call the function every 1 second
-// }
-// updateScoreEverySecond()
 //Game
 document.addEventListener('DOMContentLoaded', ()=>{
     const grid = document.querySelector('.grid')
@@ -129,9 +129,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.addEventListener('click', () => {
         audio.play();
     });
-
-
-
 
     const jewelColors = [
         'url(images/red-jewel.png)',
@@ -158,13 +155,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
     createBoard()
 
-    let colorBeingDraged
-    let colorBeingReplaced
-    let squareIdBeingDraged
-    let squareIdBeingReplaced
-
-
-
     squares.forEach(square => square.addEventListener('click', handleClick))
 
 
@@ -172,6 +162,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     let secondSquare = null
     let firstColor = null
     let secondColor = null
+
     function handleClick(event) {
         const square = event.target;
 
@@ -192,14 +183,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
         }
 
     }
-
-
+    function checkForChange(firstSquare, secondSquare){
+        let firstId = parseInt(firstSquare.id)
+        let secondId = parseInt(secondSquare.id)
+        let firstColor = firstSquare.style.backgroundImage
+        let secondColor = secondSquare.style.backgroundImage
+    }
     function swapSquares(firstSquare, secondSquare) {
         const firstId = parseInt(firstSquare.id)
         const secondId = parseInt(secondSquare.id)
         firstColor = firstSquare.style.backgroundImage
         secondColor = secondSquare.style.backgroundImage
-        
+        checkForChange(firstSquare,secondSquare)
         if (checkForAdjacent(firstSquare,secondSquare)){
             // Swap the gems
             const tempBackgroundImage = firstSquare.style.backgroundImage
@@ -216,8 +211,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
             const hush = new Audio('sounds/hush.mp3');
             hush.volume=0.7
             hush.play()
-
-
 
             setTimeout(()=>{
                 let row = checkForRow()
@@ -258,9 +251,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                     secondSquare.id = tempId;
 
                     squares[firstId].style.backgroundImage = firstColor;
-                    const hush = new Audio('sounds/no-good.mp3');
-                    hush.volume=0.7
-                    hush.play()
+
                     // reset first and second square variables
                     firstSquare = null
                     secondSquare = null
@@ -269,10 +260,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
             },100)
 
-        }else {
-            const hush = new Audio('sounds/no-good.mp3');
-            hush.volume=0.7
-            hush.play()
         }
     }
 
@@ -284,9 +271,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
         const isAdjacentRow = (diff === 1 && Math.floor(index1 / width) === Math.floor(index2 / width))
         return isAdjacentCol || isAdjacentRow
     }
-    //movedown if cleared
-
-
 
     function checkForRow() {
         let row = -1;
@@ -297,7 +281,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 
             const isMatch = currentGem.style.backgroundImage === nextGem.style.backgroundImage
-                && nextGem.style.backgroundImage === nextNextGem.style.backgroundImage;
+                && nextGem.style.backgroundImage === nextNextGem.style.backgroundImage && currentGem.style.backgroundImage !== '';
 
             if (isMatch && i % width < width - 2) {
                 row = i;
@@ -306,11 +290,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 currentGem.style.backgroundImage = '';
                 nextGem.style.backgroundImage = '';
                 nextNextGem.style.backgroundImage = '';
+                updateScore(5);
+
                 console.log("torles kesz")
 
             }
         }
-
         return row;
     }
 
@@ -330,24 +315,27 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 squares[i + width].style.backgroundImage = '';
                 squares[i + width * 2].style.backgroundImage = '';
                 console.log("torles kesz")
+                updateScore(5);
 
             }
         }
-
         return vertical;
     }
 
-    // setInterval(moveDown,500)
-    // setInterval(checkForVertical,500)
-    // setInterval(checkForRow,500)
-
-    function isMoveDownNeeded(){
-        for (let i = 0; i < 55; i++) {
-            if (squares[i + width].style.backgroundImage === '') {
-                return true
+    function isMoveDownNeeded() {
+        for (let i = 0; i < squares.length; i++) {
+            for (let i = 0; i < squares.length; i++) {
+                if (squares[i + width] && squares[i + width].style.backgroundImage === '') {
+                    return true;
+                }
             }
+            for (let i = squares.length - 1; i >= 0; i--) {
+                if (squares[i + width] && squares[i + width].style.backgroundImage === '') {
+                    return true;
+                }
+            }
+            return false;
         }
-        return false
     }
 
     function moveDown(){
@@ -361,31 +349,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 const firstRow = [0, 1, 2, 3, 4, 5, 6, 7]
                 const isFirstRow = firstRow.includes(i)
                 if (isFirstRow && squares[i].style.backgroundImage === ''){
-                    // console.log("lekellcsuszni")
                     let randomColor = Math.floor(Math.random() * jewelColors.length)
                     squares[i].style.backgroundImage = jewelColors[randomColor]
                 }
 
             }
         }
-
-
     }
     setInterval(function(){
+        checkForRow();
+        checkForVertical();
         while (isMoveDownNeeded()){
-            console.log("kell csuszni")
             moveDown()
         }
-        console.log("nem kell már lecsuszni")
-
-        // if (checkForRow() ||
-        //     checkForVertical()){
-        //     console.log("itt lesz sazr")
-        //     updateScore(5)
-        //
-        // }
-
     }, 500);
-
-
 })
